@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://zjbztianya.github.io/sitemap.xml
