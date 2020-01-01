@@ -402,7 +402,7 @@
 
 <p>IRoutes定义了所有的路由处理接口</p>
 
-<pre><code class="language-go">type IRoutes interface {
+<pre><code class="language-golang">type IRoutes interface {
 	Use(...HandlerFunc) IRoutes
 
 	Handle(string, string, ...HandlerFunc) IRoutes
@@ -423,7 +423,7 @@
 
 <p>RouterGroup实现了以上所有定义的接口,它的结构体定义如下：</p>
 
-<pre><code class="language-go"> type RouterGroup struct {
+<pre><code class="language-golang"> type RouterGroup struct {
 	Handlers HandlersChain  //中间件handlers
 	basePath string    //路由组的公共前缀
 	engine   *Engine   //gin的框架引擎
@@ -435,7 +435,7 @@
 
 <p>可以使用Use方法在group中添加中间件,Use方法经常使用，比如添加log中间件和auth中间件</p>
 
-<pre><code class="language-go">func (group *RouterGroup) Use(middleware ...HandlerFunc) IRoutes {
+<pre><code class="language-golang">func (group *RouterGroup) Use(middleware ...HandlerFunc) IRoutes {
 	group.Handlers = append(group.Handlers, middleware...)
 	return group.returnObj()
 }
@@ -443,7 +443,7 @@
 
 <p>Group方法可以实现在RouterGroup中再创建一个新的RouterGroup，把原basePath和新的相对路径relativePath组合成一个绝对路径作为新的basePath，新Handlers也是与原Handlers组合而成</p>
 
-<pre><code class="language-go">func (group *RouterGroup) Group(relativePath string, handlers ...HandlerFunc) *RouterGroup {
+<pre><code class="language-golang">func (group *RouterGroup) Group(relativePath string, handlers ...HandlerFunc) *RouterGroup {
 	return &amp;RouterGroup{
 		Handlers: group.combineHandlers(handlers),
 		basePath: group.calculateAbsolutePath(relativePath),
@@ -454,7 +454,7 @@
 
 <p>最后讲一下RouterGroup的核心方法handle,实现如下:</p>
 
-<pre><code class="language-go">func (group *RouterGroup) handle(httpMethod, relativePath string, handlers HandlersChain) IRoutes {
+<pre><code class="language-golang">func (group *RouterGroup) handle(httpMethod, relativePath string, handlers HandlersChain) IRoutes {
 	absolutePath := group.calculateAbsolutePath(relativePath)
 	handlers = group.combineHandlers(handlers)
 	group.engine.addRoute(httpMethod, absolutePath, handlers)
