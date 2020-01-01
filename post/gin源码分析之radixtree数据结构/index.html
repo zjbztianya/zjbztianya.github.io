@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Hello - 仗剑奔走天涯</title>
+  <title>Gin源码分析之RadixTree数据结构 - 仗剑奔走天涯</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -23,7 +23,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 
 <meta name="author" content="zjbztianya" />
-  <meta name="description" content="Hello!" />
+  <meta name="description" content="概述 Radix Tree数据结构 定义 insertChild addRoute getValue 概述 HTTP router的核心数据结构之一就是Radix Tree了，也就是压缩Trie(字典树),比Trie更加节" />
 
   <meta name="keywords" content="Hugo, theme, jane" />
 
@@ -35,7 +35,7 @@
 <meta name="generator" content="Hugo 0.59.0" />
 
 
-<link rel="canonical" href="https://zjbztianya.github.io/post/hello/" />
+<link rel="canonical" href="https://zjbztianya.github.io/post/gin%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Bradixtree%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" />
 
 
 
@@ -59,26 +59,26 @@
 
 
 
-<meta property="og:title" content="Hello" />
-<meta property="og:description" content="Hello!" />
+<meta property="og:title" content="Gin源码分析之RadixTree数据结构" />
+<meta property="og:description" content="概述 Radix Tree数据结构 定义 insertChild addRoute getValue 概述 HTTP router的核心数据结构之一就是Radix Tree了，也就是压缩Trie(字典树),比Trie更加节" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://zjbztianya.github.io/post/hello/" />
-<meta property="article:published_time" content="2019-11-07T02:15:27+08:00" />
-<meta property="article:modified_time" content="2019-11-07T02:15:27+08:00" />
-<meta itemprop="name" content="Hello">
-<meta itemprop="description" content="Hello!">
+<meta property="og:url" content="https://zjbztianya.github.io/post/gin%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Bradixtree%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" />
+<meta property="article:published_time" content="2020-01-01T22:07:55+08:00" />
+<meta property="article:modified_time" content="2020-01-01T22:07:55+08:00" />
+<meta itemprop="name" content="Gin源码分析之RadixTree数据结构">
+<meta itemprop="description" content="概述 Radix Tree数据结构 定义 insertChild addRoute getValue 概述 HTTP router的核心数据结构之一就是Radix Tree了，也就是压缩Trie(字典树),比Trie更加节">
 
 
-<meta itemprop="datePublished" content="2019-11-07T02:15:27&#43;08:00" />
-<meta itemprop="dateModified" content="2019-11-07T02:15:27&#43;08:00" />
-<meta itemprop="wordCount" content="1">
+<meta itemprop="datePublished" content="2020-01-01T22:07:55&#43;08:00" />
+<meta itemprop="dateModified" content="2020-01-01T22:07:55&#43;08:00" />
+<meta itemprop="wordCount" content="2688">
 
 
 
 <meta itemprop="keywords" content="" />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Hello"/>
-<meta name="twitter:description" content="Hello!"/>
+<meta name="twitter:title" content="Gin源码分析之RadixTree数据结构"/>
+<meta name="twitter:description" content="概述 Radix Tree数据结构 定义 insertChild addRoute getValue 概述 HTTP router的核心数据结构之一就是Radix Tree了，也就是压缩Trie(字典树),比Trie更加节"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -340,11 +340,11 @@
           <article class="post bg-white">
     
     <header class="post-header">
-      <h1 class="post-title">Hello</h1>
+      <h1 class="post-title">Gin源码分析之RadixTree数据结构</h1>
       
       <div class="post-meta">
-        <time datetime="2019-11-07" class="post-time">
-          2019-11-07
+        <time datetime="2020-01-01" class="post-time">
+          2020-01-01
         </time>
         
         
@@ -362,13 +362,498 @@
 <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
-    
+    <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#概述">概述</a>
+<ul>
+<li><a href="#定义">定义</a></li>
+<li><a href="#insertchild">insertChild</a></li>
+<li><a href="#addroute">addRoute</a></li>
+<li><a href="#getvalue">getValue</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
   </div>
 </div>
 
     
     <div class="post-content">
-      <p>Hello!</p>
+      
+
+<ul>
+<li>概述</li>
+<li>Radix Tree数据结构
+
+<ul>
+<li>定义</li>
+<li>insertChild</li>
+<li>addRoute</li>
+<li>getValue</li>
+</ul></li>
+</ul>
+
+<h3 id="概述">概述</h3>
+
+<p>HTTP router的核心数据结构之一就是Radix Tree了，也就是压缩Trie(字典树),比Trie更加节省空间。通过把单子节点和父节点合并，以此减少了树的节点数，也缩短了树的深度。HTTP router的Rarix Tree和普通的Radix Tree不同点就是需要支持通配符*和:并且支持不区分大小写查询</p>
+
+<h4 id="定义">定义</h4>
+
+<p>Radix Tree的定义如下:</p>
+
+<pre><code class="language-go">type methodTree struct {
+	method string	//http请求方法
+	root   *node
+}
+</code></pre>
+
+<p>树节点的定义如下:</p>
+
+<pre><code class="language-go">type node struct {
+	path      string	//当前节点路径
+	indices   string	//各子节点路径首字母
+	children  []*node	//子节点列表
+	handlers  HandlersChain  //当前节点的handler集合
+	priority  uint32	//节点的优先级，优先级高的在父节点children数组位置会更靠前
+	nType     nodeType	//节点的类型
+	maxParams uint8		//经过此节点的后续路径的最大参数数量
+	wildChild bool		//儿子节点是否通配符类型
+    fullPath  string	//完整路径
+}
+</code></pre>
+
+<h4 id="insertchild">insertChild</h4>
+
+<p>这个函数的功能是设置好节点的path以及handers,但是path可能有带有通配符，需要对通配符进行相应的处理。在path中找到*或者:位置时,需要处理以下情形：</p>
+
+<ol>
+<li>遇到/之前都不允许再出现通配符</li>
+<li>当前节点在此之前不允许有child</li>
+<li>通配符之后的参数长度大于1</li>
+
+<li><p>如果通配符是*,那么*之后是不允许再出现/,也就是说numParams必须等于1,并且当前节点的path值最后一个字符不能为/，*前面一个字符必须为/</p>
+
+<pre><code class="language-go">func (n *node) insertChild(numParams uint8, path string, fullPath string, handlers HandlersChain) {
+	for numParams &gt; 0 {
+		// 找到通配符为起始点的前缀字符串
+		wildcard, i, valid := findWildcard(path)
+		if i &lt; 0 { // 没有查找到通配符
+			break
+		}
+
+		// 通配符字符串必须包含通配符:或者*
+		if !valid {
+			panic(&quot;only one wildcard per path segment is allowed, has: '&quot; +
+				wildcard + &quot;' in path '&quot; + fullPath + &quot;'&quot;)
+		}
+
+		// 通配符字符串必须有名字，所以只有单个通配字符是不正确的格式
+		if len(wildcard) &lt; 2 {
+			panic(&quot;wildcards must be named with a non-empty name in path '&quot; + fullPath + &quot;'&quot;)
+		}
+
+		// 如果当前节点已经存在儿子节点，那么插入通配字符串会和已存在的儿子节点冲突
+		// 导致之前的儿子节点无法查询到
+		if len(n.children) &gt; 0 {
+			panic(&quot;wildcard segment '&quot; + wildcard +
+				&quot;' conflicts with existing children in path '&quot; + fullPath + &quot;'&quot;)
+		}
+      
+		if wildcard[0] == ':' { // param
+			if i &gt; 0 {
+				// Insert prefix before the current wildcard
+				n.path = path[:i]
+				path = path[i:]
+			}
+        
+			n.wildChild = true
+			child := &amp;node{
+				nType:     param,
+				path:      wildcard,
+				maxParams: numParams,
+				fullPath:  fullPath,
+			}
+			n.children = []*node{child}
+			n = child
+			n.priority++
+			numParams--
+
+			// 如果没有以通配字符串结束，那么会有以/字符为起点的其他非通配符子串，继续递归进行处理
+			if len(wildcard) &lt; len(path) {
+				path = path[len(wildcard):]
+
+				child := &amp;node{
+					maxParams: numParams,
+					priority:  1,
+					fullPath:  fullPath,
+				}
+				n.children = []*node{child}
+				n = child
+				continue
+			}
+
+			// 在新的叶子节点插入handle,结束处理
+			n.handlers = handlers
+			return
+		}
+
+		// catchAll
+		if i+len(wildcard) != len(path) || numParams &gt; 1 {
+			panic(&quot;catch-all routes are only allowed at the end of the path in path '&quot; + fullPath + &quot;'&quot;)
+		}
+
+		if len(n.path) &gt; 0 &amp;&amp; n.path[len(n.path)-1] == '/' {
+			panic(&quot;catch-all conflicts with existing handle for the path segment root in path '&quot; + fullPath + &quot;'&quot;)
+		}
+
+		// currently fixed width 1 for '/'
+		i--
+		if path[i] != '/' {
+			panic(&quot;no / before catch-all in path '&quot; + fullPath + &quot;'&quot;)
+		}
+
+		n.path = path[:i]
+
+		// First node: catchAll node with empty path
+		child := &amp;node{
+			wildChild: true,
+			nType:     catchAll,
+			maxParams: 1,
+			fullPath:  fullPath,
+		}
+		// update maxParams of the parent node
+		if n.maxParams &lt; 1 {
+			n.maxParams = 1
+		}
+		n.children = []*node{child}
+		n.indices = string('/')
+		n = child
+		n.priority++
+
+		// second node: node holding the variable
+		child = &amp;node{
+			path:      path[i:],
+			nType:     catchAll,
+			maxParams: 1,
+			handlers:  handlers,
+			priority:  1,
+			fullPath:  fullPath,
+		}
+		n.children = []*node{child}
+
+		return
+	}
+
+	// 插入剩余的path部分和handlers到叶子节点
+	n.path = path
+	n.handlers = handlers
+	n.fullPath = fullPath
+}
+</code></pre></li>
+</ol>
+
+<h4 id="addroute">addRoute</h4>
+
+<p>此函数的的功能是添加路由，也就是把给定的URL路径插入到字典树中，并在叶子节点设置好handlers。
+1.如果是空树，那么直接执行insertChild即可
+2.如果是非空树，则需要在树中查找到适合位置进行插入。首先查找当前节点的path值和URL值的最长公共前缀，如果公共前缀长度小于URL的长度，那么需要对当前节点的进行分裂，并创建新的子节点。把当前节点的path值更新为最长公共前缀，并更新当前节点和新子节点的相关数据。如果公共前缀长度小于URL长度，并且查找不到匹配的子节点，那么需要为当前节点创建一个新的子节点，并对子节点执行insertChild,否则进入匹配的子节点，重复执行步骤2。</p>
+
+<pre><code class="language-go">// addRoute adds a node with the given handle to the path.
+// 非并发安全
+func (n *node) addRoute(path string, handlers HandlersChain) {
+	fullPath := path
+	n.priority++
+	numParams := countParams(path)
+
+	// Empty tree
+	if len(n.path) == 0 &amp;&amp; len(n.children) == 0 {
+		n.insertChild(numParams, path, fullPath, handlers)
+		n.nType = root
+		return
+	}
+
+	parentFullPathIndex := 0
+
+walk:
+	for {
+		// Update maxParams of the current node
+		if numParams &gt; n.maxParams {
+			n.maxParams = numParams
+		}
+
+		// 查找最长公共前缀
+		// This also implies that the common prefix contains no ':' or '*'
+		// since the existing key can't contain those chars.
+		i := longestCommonPrefix(path, n.path)
+
+		// 分裂节点
+		if i &lt; len(n.path) {
+			child := node{
+				path:      n.path[i:],
+				wildChild: n.wildChild,
+				indices:   n.indices,
+				children:  n.children,
+				handlers:  n.handlers,
+				priority:  n.priority - 1,
+				fullPath:  n.fullPath,
+			}
+
+			// Update maxParams (max of all children)
+			for i := range child.children {
+				if child.children[i].maxParams &gt; child.maxParams {
+					child.maxParams = child.children[i].maxParams
+				}
+			}
+
+			n.children = []*node{&amp;child}
+			// []byte for proper unicode char conversion, see #65
+			n.indices = string([]byte{n.path[i]})
+			n.path = path[:i]
+			n.handlers = nil
+			n.wildChild = false
+			n.fullPath = fullPath[:parentFullPathIndex+i]
+		}
+
+		// Make new node a child of this node
+		if i &lt; len(path) {
+			path = path[i:]
+
+			if n.wildChild {
+				parentFullPathIndex += len(n.path)
+				n = n.children[0]
+				n.priority++
+
+				// Update maxParams of the child node
+				if numParams &gt; n.maxParams {
+					n.maxParams = numParams
+				}
+				numParams--
+
+				// Check if the wildcard matches
+				if len(path) &gt;= len(n.path) &amp;&amp; n.path == path[:len(n.path)] {
+					// check for longer wildcard, e.g. :name and :names
+					if len(n.path) &gt;= len(path) || path[len(n.path)] == '/' {
+						continue walk
+					}
+				}
+
+				pathSeg := path
+				if n.nType != catchAll {
+					pathSeg = strings.SplitN(path, &quot;/&quot;, 2)[0]
+				}
+				prefix := fullPath[:strings.Index(fullPath, pathSeg)] + n.path
+				panic(&quot;'&quot; + pathSeg +
+					&quot;' in new path '&quot; + fullPath +
+					&quot;' conflicts with existing wildcard '&quot; + n.path +
+					&quot;' in existing prefix '&quot; + prefix +
+					&quot;'&quot;)
+			}
+
+			c := path[0]
+
+			// slash after param
+			if n.nType == param &amp;&amp; c == '/' &amp;&amp; len(n.children) == 1 {
+				parentFullPathIndex += len(n.path)
+				n = n.children[0]
+				n.priority++
+				continue walk
+			}
+
+			// 找到子节点path值首字符与当前URL首字母相等的子节点并进入到此子节点并从循环最开始执行
+			for i, max := 0, len(n.indices); i &lt; max; i++ {
+				if c == n.indices[i] {
+					parentFullPathIndex += len(n.path)
+					i = n.incrementChildPrio(i)
+					n = n.children[i]
+					continue walk
+				}
+			}
+
+			// Otherwise insert it
+			if c != ':' &amp;&amp; c != '*' {
+				// []byte for proper unicode char conversion, see #65
+				n.indices += string([]byte{c})
+				child := &amp;node{
+					maxParams: numParams,
+					fullPath:  fullPath,
+				}
+				n.children = append(n.children, child)
+				n.incrementChildPrio(len(n.indices) - 1)
+				n = child
+			}
+			n.insertChild(numParams, path, fullPath, handlers)
+			return
+		}
+
+		// Otherwise and handle to current node
+		if n.handlers != nil {
+			panic(&quot;handlers are already registered for path '&quot; + fullPath + &quot;'&quot;)
+		}
+		n.handlers = handlers
+		return
+	}
+}
+</code></pre>
+
+<h4 id="getvalue">getValue</h4>
+
+<p>此函数的功能是根据给定的URL值查找到相应的树节点，并把此节点的handlers和树路径上经过的参数键值对返回，如果没查找到相应树节点，则根据情况判断URL是否缺少/字符并返回，具体代码实现其实和addRoute类似，都是在对树进行查找，此处不再赘述。</p>
+
+<pre><code class="language-go">// getValue returns the handle registered with the given path (key). The values of
+// wildcards are saved to a map.
+// If no handle can be found, a TSR (trailing slash redirect) recommendation is
+// made if a handle exists with an extra (without the) trailing slash for the
+// given path.
+func (n *node) getValue(path string, po Params, unescape bool) (value nodeValue) {
+	value.params = po
+walk: // Outer loop for walking the tree
+	for {
+		prefix := n.path
+		if len(path) &gt; len(prefix) {
+			if path[:len(prefix)] == prefix {
+				path = path[len(prefix):]
+				// If this node does not have a wildcard (param or catchAll)
+				// child,  we can just look up the next child node and continue
+				// to walk down the tree
+				if !n.wildChild {
+					c := path[0]
+					indices := n.indices
+					for i, max := 0, len(indices); i &lt; max; i++ {
+						if c == indices[i] {
+							n = n.children[i]
+							prefix = n.path
+							continue walk
+						}
+					}
+
+					// Nothing found.
+					// We can recommend to redirect to the same URL without a
+					// trailing slash if a leaf exists for that path.
+					value.tsr = path == &quot;/&quot; &amp;&amp; n.handlers != nil
+					return
+				}
+
+				// handle wildcard child
+				n = n.children[0]
+				switch n.nType {
+				case param:
+					// find param end (either '/' or path end)
+					end := 0
+					for end &lt; len(path) &amp;&amp; path[end] != '/' {
+						end++
+					}
+
+					// save param value
+					if cap(value.params) &lt; int(n.maxParams) {
+						value.params = make(Params, 0, n.maxParams)
+					}
+					i := len(value.params)
+					value.params = value.params[:i+1] // expand slice within preallocated capacity
+					value.params[i].Key = n.path[1:]
+					val := path[:end]
+					if unescape {
+						var err error
+						if value.params[i].Value, err = url.QueryUnescape(val); err != nil {
+							value.params[i].Value = val // fallback, in case of error
+						}
+					} else {
+						value.params[i].Value = val
+					}
+
+					// we need to go deeper!
+					if end &lt; len(path) {
+						if len(n.children) &gt; 0 {
+							path = path[end:]
+							n = n.children[0]
+							prefix = n.path
+							continue walk
+						}
+
+						// ... but we can't
+						value.tsr = len(path) == end+1
+						return
+					}
+
+					if value.handlers = n.handlers; value.handlers != nil {
+						value.fullPath = n.fullPath
+						return
+					}
+					if len(n.children) == 1 {
+						// No handle found. Check if a handle for this path + a
+						// trailing slash exists for TSR recommendation
+						n = n.children[0]
+						value.tsr = n.path == &quot;/&quot; &amp;&amp; n.handlers != nil
+					}
+
+					return
+
+				case catchAll:
+					// save param value
+					if cap(value.params) &lt; int(n.maxParams) {
+						value.params = make(Params, 0, n.maxParams)
+					}
+					i := len(value.params)
+					value.params = value.params[:i+1] // expand slice within preallocated capacity
+					value.params[i].Key = n.path[2:]
+					if unescape {
+						var err error
+						if value.params[i].Value, err = url.QueryUnescape(path); err != nil {
+							value.params[i].Value = path // fallback, in case of error
+						}
+					} else {
+						value.params[i].Value = path
+					}
+
+					value.handlers = n.handlers
+					value.fullPath = n.fullPath
+					return
+
+				default:
+					panic(&quot;invalid node type&quot;)
+				}
+			}
+		} else if path == prefix {
+			// We should have reached the node containing the handle.
+			// Check if this node has a handle registered.
+			if value.handlers = n.handlers; value.handlers != nil {
+				value.fullPath = n.fullPath
+				return
+			}
+
+			if path == &quot;/&quot; &amp;&amp; n.wildChild &amp;&amp; n.nType != root {
+				value.tsr = true
+				return
+			}
+
+			// No handle found. Check if a handle for this path + a
+			// trailing slash exists for trailing slash recommendation
+			indices := n.indices
+			for i, max := 0, len(indices); i &lt; max; i++ {
+				if indices[i] == '/' {
+					n = n.children[i]
+					value.tsr = (len(n.path) == 1 &amp;&amp; n.handlers != nil) ||
+						(n.nType == catchAll &amp;&amp; n.children[0].handlers != nil)
+					return
+				}
+			}
+
+			return
+		}
+
+		// Nothing found. We can recommend to redirect to the same URL with an
+		// extra trailing slash if a leaf exists for that path
+		value.tsr = (path == &quot;/&quot;) ||
+			(len(prefix) == len(path)+1 &amp;&amp; prefix[len(path)] == '/' &amp;&amp;
+				path == prefix[:len(prefix)-1] &amp;&amp; n.handlers != nil)
+		return
+	}
+}
+</code></pre>
 
     </div>
 
@@ -382,7 +867,7 @@
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2019-11-07
+      2020-01-01
       
     </span>
   </p>
@@ -403,7 +888,7 @@
       
       <nav class="post-nav">
         
-          <a class="prev" href="/post/gin%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Bradixtree%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
+          <a class="prev" href="/post/gin%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Broutergroup/">
             
             <i class="iconfont">
               <svg  class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -413,10 +898,23 @@
 </svg>
 
             </i>
-            <span class="prev-text nav-default">Gin源码分析之RadixTree数据结构</span>
+            <span class="prev-text nav-default">Gin源码分析之RouterGroup</span>
             <span class="prev-text nav-mobile">Prev</span>
           </a>
         
+          <a class="next" href="/post/hello/">
+            <span class="next-text nav-default">Hello</span>
+            <span class="prev-text nav-mobile">Next</span>
+            
+            <i class="iconfont">
+              <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18">
+  <path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311 0.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889 0.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-0.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697C361.493148 60.273758 343.054193 61.470003 332.091514 74.487481z"></path>
+</svg>
+
+            </i>
+          </a>
       </nav>
     </footer>
   </article>
