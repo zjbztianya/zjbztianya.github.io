@@ -366,13 +366,13 @@
 <p>Radix Tree的定义如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt">1
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="kd">type</span> <span class="nx">methodTree</span> <span class="kd">struct</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">methodTree</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">method</span> <span class="kt">string</span>	<span class="c1">//http请求方法
 </span><span class="c1"></span>	<span class="nx">root</span>   <span class="o">*</span><span class="nx">node</span>
 <span class="p">}</span></code></pre></td></tr></table>
@@ -381,7 +381,7 @@
 <p>树节点的定义如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt"> 1
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -394,7 +394,7 @@
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="kd">type</span> <span class="nx">node</span> <span class="kd">struct</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">node</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">path</span>      <span class="kt">string</span>	<span class="c1">//当前节点路径
 </span><span class="c1"></span>	<span class="nx">indices</span>   <span class="kt">string</span>	<span class="c1">//各子节点路径首字母
 </span><span class="c1"></span>	<span class="nx">children</span>  <span class="p">[]</span><span class="o">*</span><span class="nx">node</span>	<span class="c1">//子节点列表
@@ -419,7 +419,7 @@
 <li><p>如果通配符是*,那么*之后是不允许再出现/,也就是说numParams必须等于1,并且当前节点的path值最后一个字符不能为/，*前面一个字符必须为/</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt">  1
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -537,7 +537,7 @@
 </span><span class="lnt">116
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="kd">func</span> <span class="p">(</span><span class="nx">n</span> <span class="o">*</span><span class="nx">node</span><span class="p">)</span> <span class="nf">insertChild</span><span class="p">(</span><span class="nx">numParams</span> <span class="kt">uint8</span><span class="p">,</span> <span class="nx">path</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">fullPath</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handlers</span> <span class="nx">HandlersChain</span><span class="p">)</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">n</span> <span class="o">*</span><span class="nx">node</span><span class="p">)</span> <span class="nf">insertChild</span><span class="p">(</span><span class="nx">numParams</span> <span class="kt">uint8</span><span class="p">,</span> <span class="nx">path</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">fullPath</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handlers</span> <span class="nx">HandlersChain</span><span class="p">)</span> <span class="p">{</span>
 	<span class="k">for</span> <span class="nx">numParams</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
 		<span class="c1">// 找到通配符为起始点的前缀字符串
 </span><span class="c1"></span>		<span class="nx">wildcard</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">valid</span> <span class="o">:=</span> <span class="nf">findWildcard</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span>
@@ -664,7 +664,7 @@
 2.如果是非空树，则需要在树中查找到适合位置进行插入。首先查找当前节点的path值和URL值的最长公共前缀，如果公共前缀长度小于URL的长度，那么需要对当前节点的进行分裂，并创建新的子节点。把当前节点的path值更新为最长公共前缀，并更新当前节点和新子节点的相关数据。如果公共前缀长度小于URL长度，并且查找不到匹配的子节点，那么需要为当前节点创建一个新的子节点，并对子节点执行insertChild,否则进入匹配的子节点，重复执行步骤2。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt">  1
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -801,7 +801,7 @@
 </span><span class="lnt">135
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="c1">// addRoute adds a node with the given handle to the path.
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// addRoute adds a node with the given handle to the path.
 </span><span class="c1">// 非并发安全
 </span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">n</span> <span class="o">*</span><span class="nx">node</span><span class="p">)</span> <span class="nf">addRoute</span><span class="p">(</span><span class="nx">path</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handlers</span> <span class="nx">HandlersChain</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">fullPath</span> <span class="o">:=</span> <span class="nx">path</span>
@@ -943,7 +943,7 @@
 <p>此函数的功能是根据给定的URL值查找到相应的树节点，并把此节点的handlers和树路径上经过的参数键值对返回，如果没查找到相应树节点，则根据情况判断URL是否缺少/字符并返回，具体代码实现其实和addRoute类似，都是在对树进行查找，此处不再赘述。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt">  1
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -1094,7 +1094,7 @@
 </span><span class="lnt">149
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="c1">// getValue returns the handle registered with the given path (key). The values of
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="c1">// getValue returns the handle registered with the given path (key). The values of
 </span><span class="c1">// wildcards are saved to a map.
 </span><span class="c1">// If no handle can be found, a TSR (trailing slash redirect) recommendation is
 </span><span class="c1">// made if a handle exists with an extra (without the) trailing slash for the

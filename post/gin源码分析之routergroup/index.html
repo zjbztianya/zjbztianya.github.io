@@ -362,7 +362,7 @@
 <p>IRoutes定义了所有的路由处理接口</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt"> 1
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -381,7 +381,7 @@
 </span><span class="lnt">17
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="kd">type</span> <span class="nx">IRoutes</span> <span class="kd">interface</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">IRoutes</span> <span class="kd">interface</span> <span class="p">{</span>
 	<span class="nf">Use</span><span class="p">(</span><span class="o">...</span><span class="nx">HandlerFunc</span><span class="p">)</span> <span class="nx">IRoutes</span>
 
 	<span class="nf">Handle</span><span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">string</span><span class="p">,</span> <span class="o">...</span><span class="nx">HandlerFunc</span><span class="p">)</span> <span class="nx">IRoutes</span>
@@ -403,7 +403,7 @@
 <p>RouterGroup实现了以上所有定义的接口,它的结构体定义如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt">1
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -411,7 +411,7 @@
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"> <span class="kd">type</span> <span class="nx">RouterGroup</span> <span class="kd">struct</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-go" data-lang="go"> <span class="kd">type</span> <span class="nx">RouterGroup</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">Handlers</span> <span class="nx">HandlersChain</span>  <span class="c1">//中间件handlers
 </span><span class="c1"></span>	<span class="nx">basePath</span> <span class="kt">string</span>    <span class="c1">//路由组的公共前缀
 </span><span class="c1"></span>	<span class="nx">engine</span>   <span class="o">*</span><span class="nx">Engine</span>   <span class="c1">//gin的框架引擎
@@ -424,13 +424,13 @@
 <p>可以使用Use方法在group中添加中间件,Use方法经常使用，比如添加log中间件和auth中间件</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt">1
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="kd">func</span> <span class="p">(</span><span class="nx">group</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">Use</span><span class="p">(</span><span class="nx">middleware</span> <span class="o">...</span><span class="nx">HandlerFunc</span><span class="p">)</span> <span class="nx">IRoutes</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">group</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">Use</span><span class="p">(</span><span class="nx">middleware</span> <span class="o">...</span><span class="nx">HandlerFunc</span><span class="p">)</span> <span class="nx">IRoutes</span> <span class="p">{</span>
 	<span class="nx">group</span><span class="p">.</span><span class="nx">Handlers</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">group</span><span class="p">.</span><span class="nx">Handlers</span><span class="p">,</span> <span class="nx">middleware</span><span class="o">...</span><span class="p">)</span>
 	<span class="k">return</span> <span class="nx">group</span><span class="p">.</span><span class="nf">returnObj</span><span class="p">()</span>
 <span class="p">}</span></code></pre></td></tr></table>
@@ -439,7 +439,7 @@
 <p>Group方法可以实现在RouterGroup中再创建一个新的RouterGroup，把原basePath和新的相对路径relativePath组合成一个绝对路径作为新的basePath，新Handlers也是与原Handlers组合而成</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt">1
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -448,7 +448,7 @@
 </span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="kd">func</span> <span class="p">(</span><span class="nx">group</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">Group</span><span class="p">(</span><span class="nx">relativePath</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handlers</span> <span class="o">...</span><span class="nx">HandlerFunc</span><span class="p">)</span> <span class="o">*</span><span class="nx">RouterGroup</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">group</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">Group</span><span class="p">(</span><span class="nx">relativePath</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handlers</span> <span class="o">...</span><span class="nx">HandlerFunc</span><span class="p">)</span> <span class="o">*</span><span class="nx">RouterGroup</span> <span class="p">{</span>
 	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">RouterGroup</span><span class="p">{</span>
 		<span class="nx">Handlers</span><span class="p">:</span> <span class="nx">group</span><span class="p">.</span><span class="nf">combineHandlers</span><span class="p">(</span><span class="nx">handlers</span><span class="p">),</span>
 		<span class="nx">basePath</span><span class="p">:</span> <span class="nx">group</span><span class="p">.</span><span class="nf">calculateAbsolutePath</span><span class="p">(</span><span class="nx">relativePath</span><span class="p">),</span>
@@ -460,7 +460,7 @@
 <p>最后讲一下RouterGroup的核心方法handle,实现如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt">1
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -468,7 +468,7 @@
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="kd">func</span> <span class="p">(</span><span class="nx">group</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">handle</span><span class="p">(</span><span class="nx">httpMethod</span><span class="p">,</span> <span class="nx">relativePath</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handlers</span> <span class="nx">HandlersChain</span><span class="p">)</span> <span class="nx">IRoutes</span> <span class="p">{</span>
+<pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">group</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">handle</span><span class="p">(</span><span class="nx">httpMethod</span><span class="p">,</span> <span class="nx">relativePath</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handlers</span> <span class="nx">HandlersChain</span><span class="p">)</span> <span class="nx">IRoutes</span> <span class="p">{</span>
 	<span class="nx">absolutePath</span> <span class="o">:=</span> <span class="nx">group</span><span class="p">.</span><span class="nf">calculateAbsolutePath</span><span class="p">(</span><span class="nx">relativePath</span><span class="p">)</span>
 	<span class="nx">handlers</span> <span class="p">=</span> <span class="nx">group</span><span class="p">.</span><span class="nf">combineHandlers</span><span class="p">(</span><span class="nx">handlers</span><span class="p">)</span>
 	<span class="nx">group</span><span class="p">.</span><span class="nx">engine</span><span class="p">.</span><span class="nf">addRoute</span><span class="p">(</span><span class="nx">httpMethod</span><span class="p">,</span> <span class="nx">absolutePath</span><span class="p">,</span> <span class="nx">handlers</span><span class="p">)</span>
