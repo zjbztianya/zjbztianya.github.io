@@ -63,7 +63,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://zjbztianya.github.io/" />
 
-<meta property="og:updated_time" content="2020-01-01T22:09:46+08:00" />
+<meta property="og:updated_time" content="2020-09-23T22:09:46+08:00" />
 <meta itemprop="name" content="仗剑奔走天涯">
 <meta itemprop="description" content="Hugo theme jane example site.">
 
@@ -298,16 +298,16 @@
   <header class="post-header">
     <h1 class="post-title">
       
-      <a class="post-link" href="/post/mit6.824-lab-2-raft-part-2a/"></a>
+      <a class="post-link" href="/post/hello/">Hello</a>
     </h1>
     
     <div class="post-meta">
-      <time datetime="0001-01-01" class="post-time">
-        0001-01-01
+      <time datetime="2019-11-07" class="post-time">
+        2019-11-07
       </time>
       
-      <span class="more-meta"> 833 words </span>
-      <span class="more-meta"> 4 min read </span>
+      <span class="more-meta"> 1 words </span>
+      <span class="more-meta"> 1 min read </span>
       
       
       
@@ -317,13 +317,10 @@
   <div class="post-content">
     
     <div class="post-summary">
-      MIT6.824 Lab 2: Raft - Part 2A 2A部分要求实现Raft的Leader选举和心跳，心跳通过定时发送不包含日志的AppendEntries RPCs实现。Leader选举在选举超时的时候触发。
-心跳和选举超时设计 1 2 3 4 5  const ( ElectionTick = 5 HeartbeatTick = 1 Ticker = 100 * time.Millisecond )  1 2 3 4 5 6  type Raft struct { ... electionElapsed int heartbeatElapsed int electionTimeout int }   *Tiker*是主循环的循环定时器间隔时间，*electionTimeout*是选举超时时间，设置为[ElectionTick,2*ElectionTick)。每次循环定时器超时： - Leader：对heartbeatElapsed加1,如果heartbeatElapsed大于等于HeartbeatTick,发送心跳RPC - Candidate和Follower：对electionElapsed加1,如果electionElapsed大于等于electionTimeout则说明选举超时，需发送投票RPC
-这样的设计有参考raft-structure.txt，只需要一个循环定时器，避免不断对定时器进行重置。在心跳超时的时候重置heartbeatElapsed为0，选举超时的时候重置electionElapsed为0，并重新随机electionTimeout即可。
-选举超时设置 1 2 3  func (rf *Raft) resetElectionTimeout() { rf.electionTimeout = ElectionTick + rand.
+      Hello!
     </div>
     <div class="read-more">
-      <a href="/post/mit6.824-lab-2-raft-part-2a/" class="read-more-link">Read more</a>
+      <a href="/post/hello/" class="read-more-link">Read more</a>
     </div>
     
   </div>

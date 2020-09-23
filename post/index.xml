@@ -6,10 +6,19 @@
     <description>Recent content in Posts on 仗剑奔走天涯</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 01 Jan 2020 22:09:46 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 23 Sep 2020 22:09:46 +0800</lastBuildDate>
     
 	<atom:link href="https://zjbztianya.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>MIT6.824 Lab 2: Raft - Part 2A</title>
+      <link>https://zjbztianya.github.io/post/mit6.824-lab-2-raft-part-2a/</link>
+      <pubDate>Wed, 23 Sep 2020 22:09:46 +0800</pubDate>
+      
+      <guid>https://zjbztianya.github.io/post/mit6.824-lab-2-raft-part-2a/</guid>
+      <description>MIT6.824 Lab 2: Raft - Part 2A 2A部分要求实现Raft的Leader选举和心跳，心跳通过定时发送不包含日志的AppendEntries RPCs实现。Lead</description>
+    </item>
     
     <item>
       <title>Gin源码分析之RouterGroup</title>
@@ -36,18 +45,6 @@
       
       <guid>https://zjbztianya.github.io/post/hello/</guid>
       <description>Hello!</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://zjbztianya.github.io/post/mit6.824-lab-2-raft-part-2a/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://zjbztianya.github.io/post/mit6.824-lab-2-raft-part-2a/</guid>
-      <description>MIT6.824 Lab 2: Raft - Part 2A 2A部分要求实现Raft的Leader选举和心跳，心跳通过定时发送不包含日志的AppendEntries RPCs实现。Leader选举在选举超时的时候触发。
-心跳和选举超时设计 1 2 3 4 5  const ( ElectionTick = 5 HeartbeatTick = 1 Ticker = 100 * time.Millisecond )  1 2 3 4 5 6  type Raft struct { ... electionElapsed int heartbeatElapsed int electionTimeout int }   *Tiker*是主循环的循环定时器间隔时间，*electionTimeout*是选举超时时间，设置为[ElectionTick,2*ElectionTick)。每次循环定时器超时： - Leader：对heartbeatElapsed加1,如果heartbeatElapsed大于等于HeartbeatTick,发送心跳RPC - Candidate和Follower：对electionElapsed加1,如果electionElapsed大于等于electionTimeout则说明选举超时，需发送投票RPC
-这样的设计有参考raft-structure.txt，只需要一个循环定时器，避免不断对定时器进行重置。在心跳超时的时候重置heartbeatElapsed为0，选举超时的时候重置electionElapsed为0，并重新随机electionTimeout即可。
-选举超时设置 1 2 3  func (rf *Raft) resetElectionTimeout() { rf.electionTimeout = ElectionTick + rand.</description>
     </item>
     
   </channel>
