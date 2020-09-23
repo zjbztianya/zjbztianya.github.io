@@ -398,8 +398,8 @@
 </div>
 </div>
 <p>*Tiker*是主循环的循环定时器间隔时间，*electionTimeout*是选举超时时间，设置为<strong>[ElectionTick,2*ElectionTick)</strong>。每次循环定时器超时：
-- Leader：对heartbeatElapsed加1,如果heartbeatElapsed大于等于HeartbeatTick,发送心跳RPC
-- Candidate和Follower：对electionElapsed加1,如果electionElapsed大于等于electionTimeout则说明选举超时，需发送投票RPC</p>
+* Leader：对heartbeatElapsed加1,如果heartbeatElapsed大于等于HeartbeatTick,发送心跳RPC
+* Candidate和Follower：对electionElapsed加1,如果electionElapsed大于等于electionTimeout则说明选举超时，需发送投票RPC</p>
 
 <p>这样的设计有参考<a href="https://pdos.csail.mit.edu/6.824/labs/raft-structure.txt">raft-structure.txt</a>，只需要一个循环定时器，避免不断对定时器进行重置。在心跳超时的时候重置heartbeatElapsed为0，选举超时的时候重置electionElapsed为0，并重新随机electionTimeout即可。</p>
 
@@ -739,10 +739,10 @@
 </div>
 </div>
 <p>在选举定时器超时的时候转变为候选人，然后进行选举：
-- 自己的Term加1
-- 投票给自己
-- 重置选举定时器
-- 发送投票RPCs给其他节点</p>
+* 自己的Term加1
+* 投票给自己
+* 重置选举定时器
+* 发送投票RPCs给其他节点</p>
 
 <h4 id="candidate发送投票rpcs">Candidate发送投票RPCs</h4>
 <div class="highlight"><div class="chroma">
@@ -880,9 +880,9 @@
 </div>
 </div>
 <p>首先创建一个channel voteCh用来接收每个投票RPCs结果,对每个节点单独用goroutine发送投票RPCs，并把结果发送到voteCh。同时在用一个goroutine等待每个投票RPC结果返回：
-- 如果接收到超半数的票，则成功当选为Leader,转换为Leader状态，并立即结束等待投票
-- 如果已收到所有投票RPC响应，也立即结束等待投票
-- 收到的RPCs响应的Term比Candidate的Term大，则Candidate转换为Follower，并结束等待投票</p>
+* 如果接收到超半数的票，则成功当选为Leader,转换为Leader状态，并立即结束等待投票
+* 如果已收到所有投票RPC响应，也立即结束等待投票
+* 收到的RPCs响应的Term比Candidate的Term大，则Candidate转换为Follower，并结束等待投票</p>
 
 <p>运行测试的结果:</p>
 <div class="highlight"><div class="chroma">
