@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Archive - 仗剑奔走天涯</title>
+  <title>仗剑奔走天涯</title>
   
 
 <meta name="renderer" content="webkit" />
@@ -34,8 +34,8 @@
 <meta name="generator" content="Hugo 0.59.0" />
 
 
-<link rel="canonical" href="https://zjbztianya.github.io/post/" />
-<link href="/post/index.xml" rel="alternate" type="application/rss+xml" title="仗剑奔走天涯" />
+<link rel="canonical" href="https://zjbztianya.github.io/" />
+<link href="/index.xml" rel="alternate" type="application/rss+xml" title="仗剑奔走天涯" />
 
 
 
@@ -58,17 +58,17 @@
 
 
 
-<meta property="og:title" content="Posts" />
+<meta property="og:title" content="仗剑奔走天涯" />
 <meta property="og:description" content="Hugo theme jane example site." />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://zjbztianya.github.io/post/" />
+<meta property="og:url" content="https://zjbztianya.github.io/" />
 
 <meta property="og:updated_time" content="2020-01-01T22:09:46+08:00" />
-<meta itemprop="name" content="Posts">
+<meta itemprop="name" content="仗剑奔走天涯">
 <meta itemprop="description" content="Hugo theme jane example site.">
 
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Posts"/>
+<meta name="twitter:title" content="仗剑奔走天涯"/>
 <meta name="twitter:description" content="Hugo theme jane example site."/>
 
 <!--[if lte IE 9]>
@@ -217,7 +217,7 @@
   <ul id="menu" class="menu">
     
     
-        <li class="menu-item">
+        <li class="menu-item active">
         
           
           
@@ -228,7 +228,7 @@
 
       </li>
     
-        <li class="menu-item active">
+        <li class="menu-item">
         
           
           
@@ -287,69 +287,50 @@
       <div class="content-wrapper">
         <div id="content" class="content container">
           
-<section id="archive" class="archive">
-    <div class="archive-title">
-      <span class="archive-post-counter">
-          4 posts In Total
-      </span>
-    </div>
+<section id="posts" class="posts">
+  
+  
     
-      <div class="collection-title">
-        <h2 class="archive-year">2020</h2>
-      </div>
-
-    <div class="archive-post">
-      <time datetime="2020-01-01" class="archive-post-time">
-        2020-01-01
-      </time>
-      <span class="archive-post-title">
-        <a href="/post/gin%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Broutergroup/" class="archive-post-link">
-          Gin源码分析之RouterGroup
-        </a>
-      </span>
-    </div>
+  
+  
+  
+    <article class="post bg-white">
+  <header class="post-header">
+    <h1 class="post-title">
+      
+      <a class="post-link" href="/post/mit6.824-lab-2-raft-part-2a/"></a>
+    </h1>
     
-
-    <div class="archive-post">
-      <time datetime="2020-01-01" class="archive-post-time">
-        2020-01-01
-      </time>
-      <span class="archive-post-title">
-        <a href="/post/gin%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Bradixtree%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="archive-post-link">
-          Gin源码分析之RadixTree数据结构
-        </a>
-      </span>
-    </div>
-    
-      <div class="collection-title">
-        <h2 class="archive-year">2019</h2>
-      </div>
-
-    <div class="archive-post">
-      <time datetime="2019-11-07" class="archive-post-time">
-        2019-11-07
-      </time>
-      <span class="archive-post-title">
-        <a href="/post/hello/" class="archive-post-link">
-          Hello
-        </a>
-      </span>
-    </div>
-    
-      <div class="collection-title">
-        <h2 class="archive-year">0001</h2>
-      </div>
-
-    <div class="archive-post">
-      <time datetime="0001-01-01" class="archive-post-time">
+    <div class="post-meta">
+      <time datetime="0001-01-01" class="post-time">
         0001-01-01
       </time>
-      <span class="archive-post-title">
-        <a href="/post/mit6.824-lab-2-raft-part-2a/" class="archive-post-link">
-          
-        </a>
-      </span>
-    </div></section>
+      
+      <span class="more-meta"> 833 words </span>
+      <span class="more-meta"> 4 min read </span>
+      
+      
+      
+    </div>
+  </header>
+  
+  <div class="post-content">
+    
+    <div class="post-summary">
+      MIT6.824 Lab 2: Raft - Part 2A 2A部分要求实现Raft的Leader选举和心跳，心跳通过定时发送不包含日志的AppendEntries RPCs实现。Leader选举在选举超时的时候触发。
+心跳和选举超时设计 1 2 3 4 5  const ( ElectionTick = 5 HeartbeatTick = 1 Ticker = 100 * time.Millisecond )  1 2 3 4 5 6  type Raft struct { ... electionElapsed int heartbeatElapsed int electionTimeout int }   *Tiker*是主循环的循环定时器间隔时间，*electionTimeout*是选举超时时间，设置为[ElectionTick,2*ElectionTick)。每次循环定时器超时： - Leader：对heartbeatElapsed加1,如果heartbeatElapsed大于等于HeartbeatTick,发送心跳RPC - Candidate和Follower：对electionElapsed加1,如果electionElapsed大于等于electionTimeout则说明选举超时，需发送投票RPC
+这样的设计有参考raft-structure.txt，只需要一个循环定时器，避免不断对定时器进行重置。在心跳超时的时候重置heartbeatElapsed为0，选举超时的时候重置electionElapsed为0，并重新随机electionTimeout即可。
+选举超时设置 1 2 3  func (rf *Raft) resetElectionTimeout() { rf.electionTimeout = ElectionTick + rand.
+    </div>
+    <div class="read-more">
+      <a href="/post/mit6.824-lab-2-raft-part-2a/" class="read-more-link">Read more</a>
+    </div>
+    
+  </div>
+</article>
+
+  
+</section>
 
 
 
@@ -368,6 +349,22 @@
 
   
   
+
+  
+  
+  <nav class="pagination">
+    <ul>
+      
+      <li >
+        <a href="/">1</a>
+      </li>
+      
+      <li  class="active" >
+        <a href="/page/2/">2</a>
+      </li>
+      
+    </ul>
+  </nav>
 
   
   

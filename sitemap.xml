@@ -44,6 +44,11 @@
   </url>
   
   <url>
+    <loc>https://zjbztianya.github.io/post/mit6.824-lab-2-raft-part-2a/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://zjbztianya.github.io/categories/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
