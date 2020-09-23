@@ -329,33 +329,24 @@
 <ul>
 <li><a href="#心跳和选举超时设计">心跳和选举超时设计</a>
 <ul>
-<li>
-<ul>
 <li><a href="#选举超时设置">选举超时设置</a></li>
 <li><a href="#选举超时判断条件">选举超时判断条件</a></li>
 <li><a href="#检测是否选举超时">检测是否选举超时</a></li>
 <li><a href="#心跳超时判断条件">心跳超时判断条件</a></li>
 <li><a href="#检测是否心跳超时">检测是否心跳超时</a></li>
 </ul></li>
-</ul></li>
 <li><a href="#主循环设计">主循环设计</a></li>
 <li><a href="#心跳实现">心跳实现</a>
-<ul>
-<li>
 <ul>
 <li><a href="#appendentries-rpcs定义">AppendEntries RPCs定义</a></li>
 <li><a href="#leader发送心跳rpcs">Leader发送心跳RPCs</a></li>
 <li><a href="#接收心跳">接收心跳</a></li>
 </ul></li>
-</ul></li>
 <li><a href="#选举实现">选举实现</a>
-<ul>
-<li>
 <ul>
 <li><a href="#投票rpcs定义">投票RPCs定义</a></li>
 <li><a href="#转变为candidate">转变为Candidate</a></li>
 <li><a href="#candidate发送投票rpcs">Candidate发送投票RPCs</a></li>
-</ul></li>
 </ul></li>
 </ul></li>
 </ul></li>
@@ -412,7 +403,7 @@
 
 <p>这样的设计有参考<a href="https://pdos.csail.mit.edu/6.824/labs/raft-structure.txt">raft-structure.txt</a>，只需要一个循环定时器，避免不断对定时器进行重置。在心跳超时的时候重置heartbeatElapsed为0，选举超时的时候重置electionElapsed为0，并重新随机electionTimeout即可。</p>
 
-<h5 id="选举超时设置">选举超时设置</h5>
+<h4 id="选举超时设置">选举超时设置</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
@@ -425,7 +416,7 @@
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<h5 id="选举超时判断条件">选举超时判断条件</h5>
+<h4 id="选举超时判断条件">选举超时判断条件</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
@@ -438,7 +429,7 @@
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<h5 id="检测是否选举超时">检测是否选举超时</h5>
+<h4 id="检测是否选举超时">检测是否选举超时</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
@@ -469,7 +460,7 @@
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<h5 id="心跳超时判断条件">心跳超时判断条件</h5>
+<h4 id="心跳超时判断条件">心跳超时判断条件</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
@@ -482,7 +473,7 @@
 <span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<h5 id="检测是否心跳超时">检测是否心跳超时</h5>
+<h4 id="检测是否心跳超时">检测是否心跳超时</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
@@ -554,7 +545,7 @@
 
 <h3 id="心跳实现">心跳实现</h3>
 
-<h5 id="appendentries-rpcs定义">AppendEntries RPCs定义</h5>
+<h4 id="appendentries-rpcs定义">AppendEntries RPCs定义</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
@@ -587,7 +578,7 @@
 </span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<h5 id="leader发送心跳rpcs">Leader发送心跳RPCs</h5>
+<h4 id="leader发送心跳rpcs">Leader发送心跳RPCs</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
@@ -656,7 +647,7 @@
 </div>
 <p>Leader对所有节点发送心跳，每个心跳RPC发送都使用单独的goroutine，这样不会阻塞主goroutine。在发送心跳的时候先检测是不是Leader，有可能发送中途就已经不是Leader了。需对PRC响应包进行处理,如果响应包的Term比自己的Term大，那么立即转换为Follower状态。</p>
 
-<h5 id="接收心跳">接收心跳</h5>
+<h4 id="接收心跳">接收心跳</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
@@ -693,7 +684,7 @@
 
 <h3 id="选举实现">选举实现</h3>
 
-<h5 id="投票rpcs定义">投票RPCs定义</h5>
+<h4 id="投票rpcs定义">投票RPCs定义</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
@@ -726,7 +717,7 @@
 </span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
 </div>
 </div>
-<h5 id="转变为candidate">转变为Candidate</h5>
+<h4 id="转变为candidate">转变为Candidate</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
@@ -753,7 +744,7 @@
 - 重置选举定时器
 - 发送投票RPCs给其他节点</p>
 
-<h5 id="candidate发送投票rpcs">Candidate发送投票RPCs</h5>
+<h4 id="candidate发送投票rpcs">Candidate发送投票RPCs</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
@@ -889,9 +880,9 @@
 </div>
 </div>
 <p>首先创建一个channel voteCh用来接收每个投票RPCs结果,对每个节点单独用goroutine发送投票RPCs，并把结果发送到voteCh。同时在用一个goroutine等待每个投票RPC结果返回：
-* 如果接收到超半数的票，则成功当选为Leader,转换为Leader状态，并立即结束等待投票
-* 如果已收到所有投票RPC响应，也立即结束等待投票
-* 收到的RPCs响应的Term比Candidate的Term大，则Candidate转换为Follower，并结束等待投票</p>
+- 如果接收到超半数的票，则成功当选为Leader,转换为Leader状态，并立即结束等待投票
+- 如果已收到所有投票RPC响应，也立即结束等待投票
+- 收到的RPCs响应的Term比Candidate的Term大，则Candidate转换为Follower，并结束等待投票</p>
 
 <p>运行测试的结果:</p>
 <div class="highlight"><div class="chroma">
@@ -919,7 +910,7 @@
 </div>
 </div>
 <p>使用TA的<a href="https://gist.github.com/jonhoo/f686cacb4b9fe716d5aa">批量测试脚本</a>跑10000次的结果也都通过了
-<img src="media/16008278267859/16008278743293.jpg" alt="-w371" /></p>
+<img src="/image/16008738090647.jpg" alt="" /></p>
 
     </div>
 
