@@ -32,7 +32,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.0" />
+<meta name="generator" content="Hugo 0.75.1" />
 
 
 <link rel="canonical" href="https://zjbztianya.github.io/post/gin%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Broutergroup/" />
@@ -53,7 +53,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.f1e506a781bf25d33ffc18aa6b4e972a965c58049d27d4f92b7db2e9bf28e4bf.css" integrity="sha256-8eUGp4G/JdM//Biqa06XKpZcWASdJ9T5K32y6b8o5L8=" media="screen" crossorigin="anonymous">
 
 
 
@@ -67,10 +67,8 @@
 <meta property="article:modified_time" content="2020-01-01T22:09:46+08:00" />
 <meta itemprop="name" content="Gin源码分析之RouterGroup">
 <meta itemprop="description" content="概述 RouterGroup 定义 实现 概述 RouterGroup就是根据不同的basepath，对路由进行分组，并实现了各种路由处理接口，包括各种HTTP方法的处理">
-
-
-<meta itemprop="datePublished" content="2020-01-01T22:09:46&#43;08:00" />
-<meta itemprop="dateModified" content="2020-01-01T22:09:46&#43;08:00" />
+<meta itemprop="datePublished" content="2020-01-01T22:09:46+08:00" />
+<meta itemprop="dateModified" content="2020-01-01T22:09:46+08:00" />
 <meta itemprop="wordCount" content="665">
 
 
@@ -322,47 +320,35 @@
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#概述">概述</a>
-<ul>
-<li><a href="#定义">定义</a></li>
-<li><a href="#实现">实现</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#概述">概述</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
 
     
     <div class="post-content">
-      
-
-<ul>
+      <ul>
 <li>概述</li>
 <li>RouterGroup
-
 <ul>
 <li>定义</li>
 <li>实现</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <h3 id="概述">概述</h3>
-
 <p>RouterGroup就是根据不同的basepath，对路由进行分组，并实现了各种路由处理接口，包括各种HTTP方法的处理接口，以及三个文件(StaticFile、Static、StaticFS)处理接口</p>
-
 <h4 id="定义">定义</h4>
-
 <p>IRoutes定义了所有的路由处理接口</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -397,13 +383,13 @@
 	<span class="nf">StaticFile</span><span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">IRoutes</span>
 	<span class="nf">Static</span><span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">string</span><span class="p">)</span> <span class="nx">IRoutes</span>
 	<span class="nf">StaticFS</span><span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="nx">http</span><span class="p">.</span><span class="nx">FileSystem</span><span class="p">)</span> <span class="nx">IRoutes</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>RouterGroup实现了以上所有定义的接口,它的结构体定义如下：</p>
+</div><p>RouterGroup实现了以上所有定义的接口,它的结构体定义如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -416,15 +402,14 @@
 </span><span class="c1"></span>	<span class="nx">basePath</span> <span class="kt">string</span>    <span class="c1">//路由组的公共前缀
 </span><span class="c1"></span>	<span class="nx">engine</span>   <span class="o">*</span><span class="nx">Engine</span>   <span class="c1">//gin的框架引擎
 </span><span class="c1"></span>	<span class="nx">root</span>     <span class="kt">bool</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="实现">实现</h4>
-
+</div><h4 id="实现">实现</h4>
 <p>可以使用Use方法在group中添加中间件,Use方法经常使用，比如添加log中间件和auth中间件</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -433,13 +418,13 @@
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">group</span> <span class="o">*</span><span class="nx">RouterGroup</span><span class="p">)</span> <span class="nf">Use</span><span class="p">(</span><span class="nx">middleware</span> <span class="o">...</span><span class="nx">HandlerFunc</span><span class="p">)</span> <span class="nx">IRoutes</span> <span class="p">{</span>
 	<span class="nx">group</span><span class="p">.</span><span class="nx">Handlers</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">group</span><span class="p">.</span><span class="nx">Handlers</span><span class="p">,</span> <span class="nx">middleware</span><span class="o">...</span><span class="p">)</span>
 	<span class="k">return</span> <span class="nx">group</span><span class="p">.</span><span class="nf">returnObj</span><span class="p">()</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>Group方法可以实现在RouterGroup中再创建一个新的RouterGroup，把原basePath和新的相对路径relativePath组合成一个绝对路径作为新的basePath，新Handlers也是与原Handlers组合而成</p>
+</div><p>Group方法可以实现在RouterGroup中再创建一个新的RouterGroup，把原basePath和新的相对路径relativePath组合成一个绝对路径作为新的basePath，新Handlers也是与原Handlers组合而成</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -454,13 +439,13 @@
 		<span class="nx">basePath</span><span class="p">:</span> <span class="nx">group</span><span class="p">.</span><span class="nf">calculateAbsolutePath</span><span class="p">(</span><span class="nx">relativePath</span><span class="p">),</span>
 		<span class="nx">engine</span><span class="p">:</span>   <span class="nx">group</span><span class="p">.</span><span class="nx">engine</span><span class="p">,</span>
 	<span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>最后讲一下RouterGroup的核心方法handle,实现如下:</p>
+</div><p>最后讲一下RouterGroup的核心方法handle,实现如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -473,10 +458,10 @@
 	<span class="nx">handlers</span> <span class="p">=</span> <span class="nx">group</span><span class="p">.</span><span class="nf">combineHandlers</span><span class="p">(</span><span class="nx">handlers</span><span class="p">)</span>
 	<span class="nx">group</span><span class="p">.</span><span class="nx">engine</span><span class="p">.</span><span class="nf">addRoute</span><span class="p">(</span><span class="nx">httpMethod</span><span class="p">,</span> <span class="nx">absolutePath</span><span class="p">,</span> <span class="nx">handlers</span><span class="p">)</span>
 	<span class="k">return</span> <span class="nx">group</span><span class="p">.</span><span class="nf">returnObj</span><span class="p">()</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>方法需传入HTTP方法,相对路径以及handlers，然后计算出绝对值路径和添加了中间件的新handlers，最后调用engine的添加路由方法addRoute,实际就是根据HTTP方法插入到对应的radix tree中去</p>
+</div><p>方法需传入HTTP方法,相对路径以及handlers，然后计算出绝对值路径和添加了中间件的新handlers，最后调用engine的添加路由方法addRoute,实际就是根据HTTP方法插入到对应的radix tree中去</p>
 
     </div>
 

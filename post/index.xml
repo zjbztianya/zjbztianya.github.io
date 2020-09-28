@@ -6,15 +6,11 @@
     <description>Recent content in Posts on 仗剑奔走天涯</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 23 Sep 2020 22:09:46 +0800</lastBuildDate>
-    
-	<atom:link href="https://zjbztianya.github.io/post/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 28 Sep 2020 10:04:55 +0800</lastBuildDate><atom:link href="https://zjbztianya.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>MIT6.824 Lab 2: Raft - Part 2A</title>
       <link>https://zjbztianya.github.io/post/mit6.824-lab-2-raft-part-2a/</link>
-      <pubDate>Wed, 23 Sep 2020 22:09:46 +0800</pubDate>
+      <pubDate>Mon, 28 Sep 2020 10:04:55 +0800</pubDate>
       
       <guid>https://zjbztianya.github.io/post/mit6.824-lab-2-raft-part-2a/</guid>
       <description>MIT6.824 Lab 2: Raft - Part 2A 2A部分要求实现Raft的Leader选举和心跳，心跳通过定时发送不包含日志的AppendEntries RPCs实现。Lead</description>

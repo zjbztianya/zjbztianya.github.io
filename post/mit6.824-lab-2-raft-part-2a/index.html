@@ -32,7 +32,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.0" />
+<meta name="generator" content="Hugo 0.75.1" />
 
 
 <link rel="canonical" href="https://zjbztianya.github.io/post/mit6.824-lab-2-raft-part-2a/" />
@@ -53,7 +53,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.f1e506a781bf25d33ffc18aa6b4e972a965c58049d27d4f92b7db2e9bf28e4bf.css" integrity="sha256-8eUGp4G/JdM//Biqa06XKpZcWASdJ9T5K32y6b8o5L8=" media="screen" crossorigin="anonymous">
 
 
 
@@ -63,15 +63,13 @@
 <meta property="og:description" content="MIT6.824 Lab 2: Raft - Part 2A 2A部分要求实现Raft的Leader选举和心跳，心跳通过定时发送不包含日志的AppendEntries RPCs实现。Lead" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://zjbztianya.github.io/post/mit6.824-lab-2-raft-part-2a/" />
-<meta property="article:published_time" content="2020-09-23T22:09:46+08:00" />
-<meta property="article:modified_time" content="2020-09-23T22:09:46+08:00" />
+<meta property="article:published_time" content="2020-09-28T10:04:55+08:00" />
+<meta property="article:modified_time" content="2020-09-28T10:04:55+08:00" />
 <meta itemprop="name" content="MIT6.824 Lab 2: Raft - Part 2A">
 <meta itemprop="description" content="MIT6.824 Lab 2: Raft - Part 2A 2A部分要求实现Raft的Leader选举和心跳，心跳通过定时发送不包含日志的AppendEntries RPCs实现。Lead">
-
-
-<meta itemprop="datePublished" content="2020-09-23T22:09:46&#43;08:00" />
-<meta itemprop="dateModified" content="2020-09-23T22:09:46&#43;08:00" />
-<meta itemprop="wordCount" content="2144">
+<meta itemprop="datePublished" content="2020-09-28T10:04:55+08:00" />
+<meta itemprop="dateModified" content="2020-09-28T10:04:55+08:00" />
+<meta itemprop="wordCount" content="2135">
 
 
 
@@ -301,11 +299,11 @@
       <h1 class="post-title">MIT6.824 Lab 2: Raft - Part 2A</h1>
       
       <div class="post-meta">
-        <time datetime="2020-09-23" class="post-time">
-          2020-09-23
+        <time datetime="2020-09-28" class="post-time">
+          2020-09-28
         </time>
         
-        <span class="more-meta"> 2144 words </span>
+        <span class="more-meta"> 2135 words </span>
           <span class="more-meta"> 5 min read </span>
 
         
@@ -322,117 +320,95 @@
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li><a href="#mit6-824-lab-2-raft-part-2a">MIT6.824 Lab 2: Raft - Part 2A</a>
-<ul>
-<li>
-<ul>
-<li><a href="#心跳和选举超时设计">心跳和选举超时设计</a>
-<ul>
-<li><a href="#选举超时设置">选举超时设置</a></li>
-<li><a href="#选举超时判断条件">选举超时判断条件</a></li>
-<li><a href="#检测是否选举超时">检测是否选举超时</a></li>
-<li><a href="#心跳超时判断条件">心跳超时判断条件</a></li>
-<li><a href="#检测是否心跳超时">检测是否心跳超时</a></li>
-</ul></li>
-<li><a href="#主循环设计">主循环设计</a></li>
-<li><a href="#心跳实现">心跳实现</a>
-<ul>
-<li><a href="#appendentries-rpcs定义">AppendEntries RPCs定义</a></li>
-<li><a href="#leader发送心跳rpcs">Leader发送心跳RPCs</a></li>
-<li><a href="#接收心跳">接收心跳</a></li>
-</ul></li>
-<li><a href="#选举实现">选举实现</a>
-<ul>
-<li><a href="#投票rpcs定义">投票RPCs定义</a></li>
-<li><a href="#转变为candidate">转变为Candidate</a></li>
-<li><a href="#candidate发送投票rpcs">Candidate发送投票RPCs</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#心跳和选举超时设计">心跳和选举超时设计</a></li>
+        <li><a href="#主循环设计">主循环设计</a></li>
+        <li><a href="#心跳实现">心跳实现</a></li>
+        <li><a href="#选举实现">选举实现</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
 
     
     <div class="post-content">
-      
-
-<h1 id="mit6-824-lab-2-raft-part-2a">MIT6.824 Lab 2: Raft - Part 2A</h1>
-
+      <h1 id="mit6824-lab-2-raft---part-2a">MIT6.824 Lab 2: Raft - Part 2A</h1>
 <p>2A部分要求实现Raft的Leader选举和心跳，心跳通过定时发送不包含日志的<em>AppendEntries</em> RPCs实现。Leader选举在选举超时的时候触发。</p>
-
 <h3 id="心跳和选举超时设计">心跳和选举超时设计</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">const (
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">const (
 	ElectionTick  = 5
 	HeartbeatTick = 1
 	Ticker        = 100 * time.Millisecond
-)</pre></td></tr></table>
+)
+</code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
 </span><span class="lnt">6
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">type Raft struct {
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">type Raft struct {
     ... 
 	electionElapsed  int
 	heartbeatElapsed int
 	electionTimeout  int
-}</pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>*Tiker*是主循环的循环定时器间隔时间，*electionTimeout*是选举超时时间，设置为<strong>[ElectionTick,2*ElectionTick)</strong>。每次循环定时器超时：
-*   Leader：对heartbeatElapsed加1,如果heartbeatElapsed大于等于HeartbeatTick,发送心跳RPC
-*   Candidate和Follower：对electionElapsed加1,如果electionElapsed大于等于electionTimeout则说明选举超时，需发送投票RPC</p>
-
+</div><p><em>Tiker</em>是主循环的循环定时器间隔时间，<em>electionTimeout</em>是选举超时时间，设置为**[ElectionTick,2*ElectionTick)**。每次循环定时器超时：</p>
+<ul>
+<li>Leader：对heartbeatElapsed加1,如果heartbeatElapsed大于等于HeartbeatTick,发送心跳RPC</li>
+<li>Candidate和Follower：对electionElapsed加1,如果electionElapsed大于等于electionTimeout则说明选举超时，需发送投票RPC</li>
+</ul>
 <p>这样的设计有参考<a href="https://pdos.csail.mit.edu/6.824/labs/raft-structure.txt">raft-structure.txt</a>，只需要一个循环定时器，避免不断对定时器进行重置。在心跳超时的时候重置heartbeatElapsed为0，选举超时的时候重置electionElapsed为0，并重新随机electionTimeout即可。</p>
-
-<h4 id="选举超时设置">选举超时设置</h4>
+<h5 id="选举超时设置">选举超时设置</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">resetElectionTimeout</span><span class="p">()</span> <span class="p">{</span>
 	<span class="nx">rf</span><span class="p">.</span><span class="nx">electionTimeout</span> <span class="p">=</span> <span class="nx">ElectionTick</span> <span class="o">+</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="nx">ElectionTick</span><span class="p">)</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="选举超时判断条件">选举超时判断条件</h4>
+</div><h5 id="选举超时判断条件">选举超时判断条件</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">pastElectionTimeout</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
 	<span class="k">return</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">electionElapsed</span> <span class="o">&gt;=</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">electionTimeout</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="检测是否选举超时">检测是否选举超时</h4>
+</div><h5 id="检测是否选举超时">检测是否选举超时</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -457,26 +433,26 @@
 			<span class="nx">rf</span><span class="p">.</span><span class="nf">becomeCandidate</span><span class="p">()</span>
 		<span class="p">}</span>
 	<span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="心跳超时判断条件">心跳超时判断条件</h4>
+</div><h5 id="心跳超时判断条件">心跳超时判断条件</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="p">(</span><span class="nx">rf</span> <span class="o">*</span><span class="nx">Raft</span><span class="p">)</span> <span class="nf">pastHeartbeat</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
 	<span class="k">return</span> <span class="nx">rf</span><span class="p">.</span><span class="nx">heartbeatElapsed</span> <span class="o">&gt;=</span> <span class="nx">HeartbeatTick</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="检测是否心跳超时">检测是否心跳超时</h4>
+</div><h5 id="检测是否心跳超时">检测是否心跳超时</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -501,13 +477,13 @@
 			<span class="nx">rf</span><span class="p">.</span><span class="nf">broadcastHeartbeat</span><span class="p">()</span>
 		<span class="p">}</span>
 	<span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h3 id="主循环设计">主循环设计</h3>
+</div><h3 id="主循环设计">主循环设计</h3>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -538,17 +514,15 @@
 			<span class="nx">rf</span><span class="p">.</span><span class="nf">tickHeartbeat</span><span class="p">()</span>
 		<span class="p">}</span>
 	<span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>主循环使用一个goroutine进行执行,创建一个循环定时器tiker,每次定时器超时的时候都根据节点的状态进行相应的超时检测。如果超时,Leader会发送心跳，Follower和Candidate则会增加Term,并发起投票进行选举。</p>
-
+</div><p>主循环使用一个goroutine进行执行,创建一个循环定时器tiker,每次定时器超时的时候都根据节点的状态进行相应的超时检测。如果超时,Leader会发送心跳，Follower和Candidate则会增加Term,并发起投票进行选举。</p>
 <h3 id="心跳实现">心跳实现</h3>
-
-<h4 id="appendentries-rpcs定义">AppendEntries RPCs定义</h4>
+<h5 id="appendentries-rpcs定义">AppendEntries RPCs定义</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -575,13 +549,13 @@
 <span class="kd">type</span> <span class="nx">AppendEntriesReply</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">Term</span>    <span class="kt">int</span>  <span class="c1">//currentTerm, for leader to update itself
 </span><span class="c1"></span>	<span class="nx">Success</span> <span class="kt">bool</span> <span class="c1">//true if follower contained entry matching prevLogIndex and prevLogTerm
-</span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="leader发送心跳rpcs">Leader发送心跳RPCs</h4>
+</div><h5 id="leader发送心跳rpcs">Leader发送心跳RPCs</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -642,15 +616,14 @@
 			<span class="p">}</span>
 		<span class="p">}(</span><span class="nx">i</span><span class="p">)</span>
 	<span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>Leader对所有节点发送心跳，每个心跳RPC发送都使用单独的goroutine，这样不会阻塞主goroutine。在发送心跳的时候先检测是不是Leader，有可能发送中途就已经不是Leader了。需对PRC响应包进行处理,如果响应包的Term比自己的Term大，那么立即转换为Follower状态。</p>
-
-<h4 id="接收心跳">接收心跳</h4>
+</div><p>Leader对所有节点发送心跳，每个心跳RPC发送都使用单独的goroutine，这样不会阻塞主goroutine。在发送心跳的时候先检测是不是Leader，有可能发送中途就已经不是Leader了。需对PRC响应包进行处理,如果响应包的Term比自己的Term大，那么立即转换为Follower状态。</p>
+<h5 id="接收心跳">接收心跳</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -677,17 +650,15 @@
 	<span class="nx">rf</span><span class="p">.</span><span class="nf">becomeFollower</span><span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">Term</span><span class="p">)</span>
 	<span class="nx">reply</span><span class="p">.</span><span class="nx">Success</span> <span class="p">=</span> <span class="kc">true</span>
 	<span class="k">return</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>接收者需要对自己的Term和PPC的Term进行比较，如果自己的大，那么直接拒绝后续执行并返回。否则重置选举超时并更新自己的Term，这里简化成转换为Follower状态，因为Leader或者Candidate接收到心跳也需要转变为Follower。</p>
-
+</div><p>接收者需要对自己的Term和PPC的Term进行比较，如果自己的大，那么直接拒绝后续执行并返回。否则重置选举超时并更新自己的Term，这里简化成转换为Follower状态，因为Leader或者Candidate接收到心跳也需要转变为Follower。</p>
 <h3 id="选举实现">选举实现</h3>
-
-<h4 id="投票rpcs定义">投票RPCs定义</h4>
+<h5 id="投票rpcs定义">投票RPCs定义</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -714,13 +685,13 @@
 	<span class="c1">// Your data here (2A).
 </span><span class="c1"></span>	<span class="nx">Term</span>        <span class="kt">int</span>  <span class="c1">//currentTerm, for candidate to update itself
 </span><span class="c1"></span>	<span class="nx">VoteGranted</span> <span class="kt">bool</span> <span class="c1">//true means candidate received vote
-</span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="转变为candidate">转变为Candidate</h4>
+</div><h5 id="转变为candidate">转变为Candidate</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -735,19 +706,20 @@
 	<span class="nx">rf</span><span class="p">.</span><span class="nx">voteFor</span> <span class="p">=</span> <span class="o">-</span><span class="mi">1</span>
 	<span class="nx">rf</span><span class="p">.</span><span class="nf">resetElectionTimeout</span><span class="p">()</span>
 	<span class="k">go</span> <span class="nx">rf</span><span class="p">.</span><span class="nf">startElection</span><span class="p">()</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>在选举定时器超时的时候转变为候选人，然后进行选举：
-*   自己的Term加1
-*   投票给自己
-*   重置选举定时器
-*   发送投票RPCs给其他节点</p>
-
-<h4 id="candidate发送投票rpcs">Candidate发送投票RPCs</h4>
+</div><p>在选举定时器超时的时候转变为候选人，然后进行选举：</p>
+<ul>
+<li>自己的Term加1</li>
+<li>投票给自己</li>
+<li>重置选举定时器</li>
+<li>发送投票RPCs给其他节点</li>
+</ul>
+<h5 id="candidate发送投票rpcs">Candidate发送投票RPCs</h5>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -876,18 +848,19 @@
 	<span class="p">}()</span>
 	<span class="nx">wg</span><span class="p">.</span><span class="nf">Wait</span><span class="p">()</span>
 	<span class="nx">doneCh</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>首先创建一个channel voteCh用来接收每个投票RPCs结果,对每个节点单独用goroutine发送投票RPCs，并把结果发送到voteCh。同时在用一个goroutine等待每个投票RPC结果返回：
-*   如果接收到超半数的票，则成功当选为Leader,转换为Leader状态，并立即结束等待投票
-*   如果已收到所有投票RPC响应，也立即结束等待投票
-*   收到的RPCs响应的Term比Candidate的Term大，则Candidate转换为Follower，并结束等待投票</p>
-
+</div><p>首先创建一个channel voteCh用来接收每个投票RPCs结果,对每个节点单独用goroutine发送投票RPCs，并把结果发送到voteCh。同时在用一个goroutine等待每个投票RPC结果返回：</p>
+<ul>
+<li>如果接收到超半数的票，则成功当选为Leader,转换为Leader状态，并立即结束等待投票</li>
+<li>如果已收到所有投票RPC响应，也立即结束等待投票</li>
+<li>收到的RPCs响应的Term比Candidate的Term大，则Candidate转换为Follower，并结束等待投票</li>
+</ul>
 <p>运行测试的结果:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -900,17 +873,17 @@
 <td class="lntd">
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="o">==</span><span class="p">=</span> <span class="nx">RUN</span>   <span class="nx">TestInitialElection2A</span>
 <span class="nf">Test</span> <span class="p">(</span><span class="mi">2</span><span class="nx">A</span><span class="p">):</span> <span class="nx">initial</span> <span class="nx">election</span> <span class="o">...</span>
-  <span class="o">...</span> <span class="nx">Passed</span> <span class="o">--</span>   <span class="mf">3.5</span>  <span class="mi">3</span>   <span class="mi">62</span>   <span class="mi">16400</span>    <span class="mi">0</span>
+ <span class="o">...</span> <span class="nx">Passed</span> <span class="o">--</span>   <span class="mf">3.5</span>  <span class="mi">3</span>   <span class="mi">62</span>   <span class="mi">16400</span>    <span class="mi">0</span>
 <span class="o">---</span> <span class="nx">PASS</span><span class="p">:</span> <span class="nf">TestInitialElection2A</span> <span class="p">(</span><span class="mf">3.51</span><span class="nx">s</span><span class="p">)</span>
 <span class="o">==</span><span class="p">=</span> <span class="nx">RUN</span>   <span class="nx">TestReElection2A</span>
 <span class="nf">Test</span> <span class="p">(</span><span class="mi">2</span><span class="nx">A</span><span class="p">):</span> <span class="nx">election</span> <span class="nx">after</span> <span class="nx">network</span> <span class="nx">failure</span> <span class="o">...</span>
-  <span class="o">...</span> <span class="nx">Passed</span> <span class="o">--</span>   <span class="mf">5.0</span>  <span class="mi">3</span>  <span class="mi">122</span>   <span class="mi">25088</span>    <span class="mi">0</span>
+ <span class="o">...</span> <span class="nx">Passed</span> <span class="o">--</span>   <span class="mf">5.0</span>  <span class="mi">3</span>  <span class="mi">122</span>   <span class="mi">25088</span>    <span class="mi">0</span>
 <span class="o">---</span> <span class="nx">PASS</span><span class="p">:</span> <span class="nf">TestReElection2A</span> <span class="p">(</span><span class="mf">5.01</span><span class="nx">s</span><span class="p">)</span>
-<span class="nx">PASS</span></code></pre></td></tr></table>
+<span class="nx">PASS</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>使用TA的<a href="https://gist.github.com/jonhoo/f686cacb4b9fe716d5aa">批量测试脚本</a>跑10000次的结果也都通过了
-<img src="/image/16008738090647.jpg" alt="" /></p>
+</div><p>使用TA的<a href="https://gist.github.com/jonhoo/f686cacb4b9fe716d5aa">批量测试脚本</a>跑10000次的结果也都通过了
+<img src="https://raw.githubusercontent.com/zjbztianya/picture/master/20200928095519.png" alt=""></p>
 
     </div>
 
@@ -924,7 +897,7 @@
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-      2020-09-23
+      2020-09-28
       
     </span>
   </p>

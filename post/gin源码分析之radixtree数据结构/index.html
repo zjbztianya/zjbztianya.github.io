@@ -32,7 +32,7 @@
 
 
 
-<meta name="generator" content="Hugo 0.59.0" />
+<meta name="generator" content="Hugo 0.75.1" />
 
 
 <link rel="canonical" href="https://zjbztianya.github.io/post/gin%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8Bradixtree%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" />
@@ -53,7 +53,7 @@
 
 
 
-<link rel="stylesheet" href="/sass/jane.min.af20b78e95c84de86b00a0242a4a77bd2601700e1b250edf27537d957ac0041d.css" integrity="sha256-ryC3jpXITehrAKAkKkp3vSYBcA4bJQ7fJ1N9lXrABB0=" media="screen" crossorigin="anonymous">
+<link rel="stylesheet" href="/sass/jane.min.f1e506a781bf25d33ffc18aa6b4e972a965c58049d27d4f92b7db2e9bf28e4bf.css" integrity="sha256-8eUGp4G/JdM//Biqa06XKpZcWASdJ9T5K32y6b8o5L8=" media="screen" crossorigin="anonymous">
 
 
 
@@ -67,10 +67,8 @@
 <meta property="article:modified_time" content="2020-01-01T22:07:55+08:00" />
 <meta itemprop="name" content="Gin源码分析之RadixTree数据结构">
 <meta itemprop="description" content="概述 Radix Tree数据结构 定义 insertChild addRoute getValue 概述 HTTP router的核心数据结构之一就是Radix Tree了，也就是压缩Trie(字典树),比Trie更加节">
-
-
-<meta itemprop="datePublished" content="2020-01-01T22:07:55&#43;08:00" />
-<meta itemprop="dateModified" content="2020-01-01T22:07:55&#43;08:00" />
+<meta itemprop="datePublished" content="2020-01-01T22:07:55+08:00" />
+<meta itemprop="dateModified" content="2020-01-01T22:07:55+08:00" />
 <meta itemprop="wordCount" content="3103">
 
 
@@ -322,51 +320,37 @@
   <h2 class="post-toc-title">Table of Contents</h2>
   <div class="post-toc-content">
     <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#概述">概述</a>
-<ul>
-<li><a href="#定义">定义</a></li>
-<li><a href="#insertchild">insertChild</a></li>
-<li><a href="#addroute">addRoute</a></li>
-<li><a href="#getvalue">getValue</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#概述">概述</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
   </div>
 </div>
 
     
     <div class="post-content">
-      
-
-<ul>
+      <ul>
 <li>概述</li>
 <li>Radix Tree数据结构
-
 <ul>
 <li>定义</li>
 <li>insertChild</li>
 <li>addRoute</li>
 <li>getValue</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <h3 id="概述">概述</h3>
-
 <p>HTTP router的核心数据结构之一就是Radix Tree了，也就是压缩Trie(字典树),比Trie更加节省空间。通过把单子节点和父节点合并，以此减少了树的节点数，也缩短了树的深度。HTTP router的Rarix Tree和普通的Radix Tree不同点就是需要支持通配符*和:并且支持不区分大小写查询</p>
-
 <h4 id="定义">定义</h4>
-
 <p>Radix Tree的定义如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
@@ -375,13 +359,13 @@
 <pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">methodTree</span> <span class="kd">struct</span> <span class="p">{</span>
 	<span class="nx">method</span> <span class="kt">string</span>	<span class="c1">//http请求方法
 </span><span class="c1"></span>	<span class="nx">root</span>   <span class="o">*</span><span class="nx">node</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<p>树节点的定义如下:</p>
+</div><p>树节点的定义如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -404,22 +388,20 @@
 </span><span class="c1"></span>	<span class="nx">maxParams</span> <span class="kt">uint8</span>		<span class="c1">//经过此节点的后续路径的最大参数数量
 </span><span class="c1"></span>	<span class="nx">wildChild</span> <span class="kt">bool</span>		<span class="c1">//儿子节点是否通配符类型
 </span><span class="c1"></span>    <span class="nx">fullPath</span>  <span class="kt">string</span>	<span class="c1">//完整路径
-</span><span class="c1"></span><span class="p">}</span></code></pre></td></tr></table>
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="insertchild">insertChild</h4>
-
+</div><h4 id="insertchild">insertChild</h4>
 <p>这个函数的功能是设置好节点的path以及handers,但是path可能有带有通配符，需要对通配符进行相应的处理。在path中找到*或者:位置时,需要处理以下情形：</p>
-
 <ol>
 <li>遇到/之前都不允许再出现通配符</li>
 <li>当前节点在此之前不允许有child</li>
 <li>通配符之后的参数长度大于1</li>
-
-<li><p>如果通配符是*,那么*之后是不允许再出现/,也就是说numParams必须等于1,并且当前节点的path值最后一个字符不能为/，*前面一个字符必须为/</p>
+<li>如果通配符是*,那么*之后是不允许再出现/,也就是说numParams必须等于1,并且当前节点的path值最后一个字符不能为/，*前面一个字符必须为/</li>
+</ol>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">  1
+<pre class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -652,19 +634,16 @@
 </span><span class="c1"></span>	<span class="nx">n</span><span class="p">.</span><span class="nx">path</span> <span class="p">=</span> <span class="nx">path</span>
 	<span class="nx">n</span><span class="p">.</span><span class="nx">handlers</span> <span class="p">=</span> <span class="nx">handlers</span>
 	<span class="nx">n</span><span class="p">.</span><span class="nx">fullPath</span> <span class="p">=</span> <span class="nx">fullPath</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div></li>
-</ol>
-
-<h4 id="addroute">addRoute</h4>
-
+</div><h4 id="addroute">addRoute</h4>
 <p>此函数的的功能是添加路由，也就是把给定的URL路径插入到字典树中，并在叶子节点设置好handlers。
 1.如果是空树，那么直接执行insertChild即可
 2.如果是非空树，则需要在树中查找到适合位置进行插入。首先查找当前节点的path值和URL值的最长公共前缀，如果公共前缀长度小于URL的长度，那么需要对当前节点的进行分裂，并创建新的子节点。把当前节点的path值更新为最长公共前缀，并更新当前节点和新子节点的相关数据。如果公共前缀长度小于URL长度，并且查找不到匹配的子节点，那么需要为当前节点创建一个新的子节点，并对子节点执行insertChild,否则进入匹配的子节点，重复执行步骤2。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">  1
+<pre class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -935,15 +914,14 @@
 		<span class="nx">n</span><span class="p">.</span><span class="nx">handlers</span> <span class="p">=</span> <span class="nx">handlers</span>
 		<span class="k">return</span>
 	<span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
-</div>
-<h4 id="getvalue">getValue</h4>
-
+</div><h4 id="getvalue">getValue</h4>
 <p>此函数的功能是根据给定的URL值查找到相应的树节点，并把此节点的handlers和树路径上经过的参数键值对返回，如果没查找到相应树节点，则根据情况判断URL是否缺少/字符并返回，具体代码实现其实和addRoute类似，都是在对树进行查找，此处不再赘述。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="lnt">  1
+<pre class="chroma"><code><span class="lnt">  1
 </span><span class="lnt">  2
 </span><span class="lnt">  3
 </span><span class="lnt">  4
@@ -1242,7 +1220,8 @@
 				<span class="nx">path</span> <span class="o">==</span> <span class="nx">prefix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="nx">prefix</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="nx">n</span><span class="p">.</span><span class="nx">handlers</span> <span class="o">!=</span> <span class="kc">nil</span><span class="p">)</span>
 		<span class="k">return</span>
 	<span class="p">}</span>
-<span class="p">}</span></code></pre></td></tr></table>
+<span class="p">}</span>
+</code></pre></td></tr></table>
 </div>
 </div>
     </div>
